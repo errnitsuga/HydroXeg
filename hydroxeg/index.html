@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroXeg - Smart Recycling System</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="images/logo.png" type="">
+    <style>
+        /* Add these styles to ensure navigation is fully visible */
+        .nav-fixed {
+            background-color: rgba(255, 255, 255, 1) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-button {
+            background-color: #00856A !important;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+        
+        .login-button:hover {
+            background-color: #007559 !important;
+            transform: translateY(-1px);
+        }
+
+        /* Dropdown menu styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: transparent;
+            color: #00856A;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f5f5f5;
+            color: #00856A;
+        }
+
+        .dropdown-content .login-button {
+            margin: 8px 16px;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .dropdown {
+                display: none;
+            }
+        }
+    </style>
+    <script>
+        function toggleDropdown() {
+            document.getElementById("mobileDropdown").classList.toggle("show");
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+    
+</head>
+<body class="bg-[#E6FAF7]">
+    <!-- Mobile Menu Backdrop -->
+    <div class="mobile-menu-backdrop md:hidden" id="mobile-backdrop"></div>
+
+    <!-- Navigation -->
+    <nav class="nav-fixed fixed w-full z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2">
+                        <img src="images/logo.png" alt="HydroXeg Logo" class="w-12 h-12 object-contain">
+                        <span class="text-2xl font-bold text-[#00856A]">HydroXeg</span>
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="dropdown md:hidden">
+                    <button onclick="toggleDropdown()" class="dropbtn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16"/>
+                        </svg>
+                    </button>
+                    <div id="mobileDropdown" class="dropdown-content">
+                        <a href="#features">Features</a>
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="#benefits">Benefits</a>
+                        <a href="#contact">Contact</a>
+                        <a href="dashboard.html" class="login-button">Login</a>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex desktop-menu items-center space-x-8">
+                    <a href="#features" class="text-gray-700 hover:text-[#00856A] font-medium">Features</a>
+                    <a href="#how-it-works" class="text-gray-700 hover:text-[#00856A] font-medium">How It Works</a>
+                    <a href="#benefits" class="text-gray-700 hover:text-[#00856A] font-medium">Benefits</a>
+                    <a href="#contact" class="text-gray-700 hover:text-[#00856A] font-medium">Contact</a>
+                    <a href="dashboard.html" class="login-button px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl">
+                        Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <h1 class="text-5xl font-bold mb-6 text-white">
+                    Recycle Waste, Receive Water with HydroXeg
+                </h1>
+                <p class="text-lg mb-8 text-white opacity-90">
+                    The smart recycling machine that automatically sorts tin cans and paper waste while rewarding you with clean water. Make recycling rewarding.
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#" class="btn-primary">
+                        Learn More
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                    <a href="#contact" class="btn-secondary">
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section-spacing">
+        <div class="container">
+            <div class="text-center mb-16">
+                <span class="section-label">Features</span>
+                <h2>Smart Recycling Technology</h2>
+                <p class="max-w-3xl mx-auto">HydroXeg combines cutting-edge technology with environmental sustainability</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <h3>Automatic Sorting</h3>
+                    <p>Advanced sensors automatically detect and sort tin cans and paper waste</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3>Water Rewards</h3>
+                    <p>Receive a calculated amount of clean water based on your recycling contribution</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3>Real-time Updates</h3>
+                    <p>LCD screen provides instant feedback and information about your recycling impact</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="how-it-works" class="section-spacing">
+        <div class="container">
+            <div class="text-center mb-16">
+                <span class="section-label">Process</span>
+                <h2>How HydroXeg Works</h2>
+                <p class="max-w-3xl mx-auto">Simple, efficient, and rewarding recycling in just a few steps</p>
+            </div>
+            <div class="process-grid">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3>Insert Waste</h3>
+                    <p>Place your tin cans or paper waste into the designated input slot</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3>Automatic Sorting</h3>
+                    <p>Sensors detect the type of waste and sort it accordingly</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3>Receive Water</h3>
+                    <p>Get rewarded with a calculated amount of clean water based on your contribution</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="section-spacing">
+        <div class="container">
+            <div class="text-center mb-16">
+                <span class="section-label">Benefits</span>
+                <h2>Why Choose HydroXeg</h2>
+                <p class="max-w-3xl mx-auto">Creating a sustainable future through innovative recycling solutions</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h3>Environmental Impact</h3>
+                    <p>Reduces tin cans pollution in oceans and landfills</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3>Community Benefits</h3>
+                    <p>Provides access to clean water through recycling</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <h3>Sustainable Practices</h3>
+                    <p>Promotes sustainable waste management practices</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    <h3>Conservation</h3>
+                    <p>Conserves natural resources through recycling</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3>Energy Efficiency</h3>
+                    <p>Reduces energy consumption through smart recycling technology</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm0 0V5.5A2.5 2.5 0 1114.5 8H12zm0 0v1m0 0v1m0-2v1"/>
+                        </svg>
+                    </div>
+                    <h3>Economic Growth</h3>
+                    <p>Creates opportunities for sustainable economic development</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section-spacing">
+        <div class="container">
+            <div class="text-center mb-16">
+                <span class="section-label">Contact</span>
+                <h2>Get In Touch</h2>
+                <p class="max-w-3xl mx-auto">Interested in HydroXeg? We'd love to hear from you!</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info text-center mx-auto">
+                    <h3>Contact Information</h3>
+                    <p>Have questions about HydroXeg? Reach out to our team for more information.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-center">
+                            <svg class="w-6 h-6 text-[#00856A] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <span>+1 (123) 456-7890</span>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <svg class="w-6 h-6 text-[#00856A] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <span>info@hydroxeg.com</span>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <svg class="w-6 h-6 text-[#00856A] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>123 Eco Street, Green City, Earth</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold text-white mb-4">Join the Recycling Revolution</h2>
+            <p class="text-lg text-white opacity-90 mb-8">Be part of the solution. Start recycling with HydroXeg today.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#" class="bg-white text-water-blue px-6 py-3 rounded-lg hover:bg-gray-100 inline-flex items-center">
+                    Get Started
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="#" class="border-2 border-white text-white px-6 py-3 rounded-lg hover:bg-white/10">
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="footer-heading">HydroXeg</h3>
+                    <p class="text-gray-400 mb-4">Smart recycling solutions for a sustainable future.</p>
+                    <div class="social-icons flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <span class="sr-only">Facebook</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.75 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <span class="sr-only">Twitter</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <span class="sr-only">LinkedIn</span>
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="footer-heading">Quick Links</h3>
+                    <a href="#features" class="footer-link">Features</a>
+                    <a href="#how-it-works" class="footer-link">How It Works</a>
+                    <a href="#benefits" class="footer-link">Benefits</a>
+                    <a href="#contact" class="footer-link">Contact</a>
+                </div>
+                <div>
+                    <h3 class="footer-heading">Resources</h3>
+                    <a href="#" class="footer-link">Documentation</a>
+                    <a href="#" class="footer-link">Blog</a>
+                    <a href="#" class="footer-link">Support</a>
+                    <a href="#" class="footer-link">FAQ</a>
+                </div>
+                <div>
+                    <h3 class="footer-heading">Legal</h3>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Cookie Policy</a>
+                    <a href="#" class="footer-link">Sustainability</a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <p class="footer-copyright text-center">© 2024 HydroXeg. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg max-w-md w-full m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-[#00856A]"> Login</h2>
+                <button onclick="hideAdminModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="admin-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="admin-email" required class="w-full px-4 py-3 rounded-lg" placeholder="Enter admin email">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="admin-password" required class="w-full px-4 py-3 rounded-lg" placeholder="Enter password">
+                </div>
+                <button type="submit" class="w-full bg-[#00856A] text-white py-3 px-6 rounded-lg hover:bg-[#007559] transition-colors">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Your existing scripts -->
+    <script src="admin-auth.js"></script>
+    <script>
+        // Mobile menu functionality
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const mobileBackdrop = document.getElementById('mobile-backdrop');
+        let isMenuOpen = false;
+
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
+            mobileMenu.classList.toggle('show');
+            mobileBackdrop.classList.toggle('show');
+            document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+        }
+
+        function closeMenu() {
+            if (isMenuOpen) {
+                isMenuOpen = false;
+                mobileMenu.classList.remove('show');
+                mobileBackdrop.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Toggle menu on button click
+        mobileMenuButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        // Close menu when clicking backdrop
+        mobileBackdrop.addEventListener('click', closeMenu);
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                closeMenu();
+            });
+        });
+
+        // Close menu on scroll
+        window.addEventListener('scroll', () => {
+            if (isMenuOpen) {
+                closeMenu();
+            }
+        });
+
+        // Handle touch events
+        let touchStartY = 0;
+        mobileMenu.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        mobileMenu.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const diff = touchStartY - touchY;
+
+            if (diff > 50) { // Swipe up
+                closeMenu();
+            }
+        }, { passive: true });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isMenuOpen) {
+                closeMenu();
+            }
+        });
+
+        // Check authentication state
+        firebase.auth().onAuthStateChanged((user) => {
+            const loginButtons = document.querySelectorAll('.login-button');
+            loginButtons.forEach(button => {
+                if (user) {
+                    button.textContent = 'Maintenance';
+                    button.href = 'dashboard.html';
+                } else {
+                    button.textContent = 'Login';
+                    button.href = 'dashboard.html';
+                }
+            });
+        });
+
+        // Only add event listener if the element exists
+        const authModal = document.getElementById('auth-modal');
+        if (authModal) {
+            authModal.addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    hideAuthModal();
+                }
+            });
+        }
+
+        // Only add event listener if the element exists
+        const adminForm = document.getElementById('admin-form');
+        if (adminForm) {
+            adminForm.addEventListener('submit', handleAdminLogin);
+        }
+    </script>
+</body>
+</html> 
