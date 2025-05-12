@@ -28,8 +28,8 @@ let state = {
 let binFullNotified = false;
 let waterLowNotified = false;
 let waterEmptyNotified = false;
-let paperFullNotified = false;
-let tinCansFullNotified = false;
+let lastPaperNotifiedLevel = 0;
+let lastTinCansNotifiedLevel = 0;
 
 // Add system logs state
 let systemLogs = [
@@ -53,6 +53,9 @@ let mobileSidebar;
 let mobileMenuClose;
 let maintenanceModal;
 let modalClose;
+let logoutModal;
+let cancelLogoutBtn;
+let confirmLogoutBtn;
 
 // Initialize the dashboard
 function init() {
@@ -80,6 +83,9 @@ function init() {
     mobileMenuClose = document.querySelector('.mobile-menu-close');
     maintenanceModal = document.getElementById('maintenance-modal');
     modalClose = document.querySelector('.modal-close');
+    logoutModal = document.getElementById('logout-modal');
+    cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+    confirmLogoutBtn = document.getElementById('confirm-logout-btn');
 
     setupEventListeners(auth);
     checkAuth(auth);
@@ -96,10 +102,24 @@ function setupEventListeners(auth) {
     
     // Logout buttons
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => handleLogout(auth));
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogoutModal();
+        });
     }
     if (mobileLogoutBtn) {
-        mobileLogoutBtn.addEventListener('click', () => handleLogout(auth));
+        mobileLogoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogoutModal();
+        });
+    }
+    
+    // Logout modal buttons
+    if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', hideLogoutModal);
+    }
+    if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', () => handleLogout(auth));
     }
     
     // Navigation buttons
@@ -221,6 +241,20 @@ async function handleLogin(e, auth) {
     }
 }
 
+// Show/hide logout modal functions
+function showLogoutModal() {
+    if (logoutModal) {
+        logoutModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden'); // Prevent background scroll
+    }
+}
+function hideLogoutModal() {
+    if (logoutModal) {
+        logoutModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+}
+
 // Handle logout
 async function handleLogout(auth) {
     try {
@@ -228,6 +262,7 @@ async function handleLogout(auth) {
         authCheck.classList.remove('hidden');
         dashboardContent.classList.add('hidden');
         showNotification('Successfully logged out!', 'success');
+        hideLogoutModal();
     } catch (error) {
         console.error('Logout error:', error);
         showNotification('Error during logout', 'error');
@@ -370,13 +405,18 @@ function updateBinMaterialsFromFirebase() {
         updateMaterialLevel('Paper', paperLevel);
         updateBinCapacity();
         
-        // Check if paper bin is full
-        if (paperLevel >= 90 && !paperFullNotified) {
-            showNotification('Paper bin is almost full!', 'warning');
-            paperFullNotified = true;
-            addSystemLog('Paper bin is almost full', 'warning');
-        } else if (paperLevel < 90) {
-            paperFullNotified = false;
+        // Notify on every increase above 75% and at 100%
+        if (paperLevel >= 75 && paperLevel > lastPaperNotifiedLevel) {
+            if (paperLevel === 100) {
+                showNotification('Paper bin is already full!', 'error');
+                addSystemLog('Paper bin is already full', 'error');
+            } else {
+                showNotification(`Paper bin is almost full (${Math.round(paperLevel)}%)`, 'warning');
+                addSystemLog(`Paper bin is almost full (${Math.round(paperLevel)}%)`, 'warning');
+            }
+            lastPaperNotifiedLevel = Math.floor(paperLevel);
+        } else if (paperLevel < 75) {
+            lastPaperNotifiedLevel = 0;
         }
 
         // Update UI if on bins tab
@@ -398,13 +438,18 @@ function updateBinMaterialsFromFirebase() {
         updateMaterialLevel('Tin Cans', canLevel);
         updateBinCapacity();
         
-        // Check if tin can bin is full
-        if (canLevel >= 90 && !tinCansFullNotified) {
-            showNotification('Tin can bin is almost full!', 'warning');
-            tinCansFullNotified = true;
-            addSystemLog('Tin can bin is almost full', 'warning');
-        } else if (canLevel < 90) {
-            tinCansFullNotified = false;
+        // Notify on every increase above 75% and at 100%
+        if (canLevel >= 75 && canLevel > lastTinCansNotifiedLevel) {
+            if (canLevel === 100) {
+                showNotification('Tin can bin is already full!', 'error');
+                addSystemLog('Tin can bin is already full', 'error');
+            } else {
+                showNotification(`Tin can bin is almost full (${Math.round(canLevel)}%)`, 'warning');
+                addSystemLog(`Tin can bin is almost full (${Math.round(canLevel)}%)`, 'warning');
+            }
+            lastTinCansNotifiedLevel = Math.floor(canLevel);
+        } else if (canLevel < 75) {
+            lastTinCansNotifiedLevel = 0;
         }
 
         // Update UI if on bins tab
@@ -514,21 +559,43 @@ function updateMaterialLevel(materialType, level) {
 }
 
 // Function to show notifications
-function showNotification(message, type = 'info') {
+function showNotification(message, type = 'info', duration = 3000) {
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-        type === 'success' ? 'bg-green-500' : 
-        type === 'error' ? 'bg-red-500' : 
-        type === 'warning' ? 'bg-yellow-500' :
-        'bg-blue-500'
-    } text-white`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
+    notification.className = `notification ${type} p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 translate-x-full`;
     
-    // Remove notification after 3 seconds
+    // Set background color based on type
+    switch(type) {
+        case 'success':
+            notification.style.backgroundColor = '#10B981';
+            break;
+        case 'error':
+            notification.style.backgroundColor = '#EF4444';
+            break;
+        case 'warning':
+            notification.style.backgroundColor = '#F59E0B';
+            break;
+        default:
+            notification.style.backgroundColor = '#3B82F6';
+    }
+    
+    notification.textContent = message;
+    
+    const container = document.getElementById('notification-container');
+    container.appendChild(notification);
+    
+    // Trigger reflow to enable animation
+    notification.offsetHeight;
+    
+    // Slide in
+    notification.style.transform = 'translateX(0)';
+    
+    // Remove after duration
     setTimeout(() => {
-        notification.remove();
-    }, 3000);
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            container.removeChild(notification);
+        }, 300);
+    }, duration);
 }
 
 // Initialize when DOM is loaded
@@ -812,11 +879,16 @@ function renderMaintenance() {
         <!-- Quick Actions Section -->
         <div class="dashboard-card p-6 mb-8">
             <h3 class="text-lg font-semibold text-[#1E293B] mb-4">Quick Actions</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button id="empty-bin-btn" 
                     class="w-full py-3 bg-[#22C55E] hover:bg-[#16A34A] text-white rounded-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center">
                     <i data-lucide="trash-2" class="w-5 h-5 mr-2"></i>
                     Empty Bin
+                </button>
+                <button id="clear-logs-btn" 
+                    class="w-full py-3 bg-[#F59E42] hover:bg-[#EA580C] text-white rounded-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center">
+                    <i data-lucide="trash" class="w-5 h-5 mr-2"></i>
+                    Clear System Logs
                 </button>
                 <button onclick="handleMaintenanceAction('report')" 
                     class="w-full py-3 bg-[#EF4444] hover:bg-[#DC2626] text-white rounded-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center">
@@ -915,6 +987,40 @@ function renderMaintenance() {
                     Empty Bin
                 `;
                 emptyBinBtn.disabled = false;
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+        });
+    }
+
+    // Add event listener for clear logs button
+    const clearLogsBtn = document.getElementById('clear-logs-btn');
+    if (clearLogsBtn) {
+        clearLogsBtn.addEventListener('click', async () => {
+            try {
+                clearLogsBtn.innerHTML = `
+                    <div class="flex items-center justify-center">
+                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Clearing...
+                    </div>
+                `;
+                clearLogsBtn.disabled = true;
+                // Clear logs in Firebase
+                await database.ref('SystemLogs').remove();
+                // Clear logs in UI
+                systemLogs = [];
+                renderMaintenance();
+                showNotification('System logs cleared!', 'success');
+            } catch (error) {
+                console.error('Error clearing logs:', error);
+                showNotification('Error clearing logs', 'error');
+            } finally {
+                clearLogsBtn.innerHTML = `
+                    <i data-lucide="trash" class="w-5 h-5 mr-2"></i>
+                    Clear System Logs
+                `;
+                clearLogsBtn.disabled = false;
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }

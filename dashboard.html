@@ -55,11 +55,14 @@
 
     <!-- Dashboard Content -->
     <div id="dashboard-content" class="hidden min-h-screen flex">
+        <!-- Notification Container -->
+        <div id="notification-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow-lg fixed h-full left-0 top-0 z-30 transition-transform duration-300 transform lg:translate-x-0" id="sidebar">
             <div class="h-full flex flex-col">
                 <!-- Logo -->
-                <a href="index.html" class="p-4 flex items-center space-x-3 hover:bg-gray-50 rounded-lg transition-colors">
+                <a href="index.html" class="p-4 flex items-center space-x-3 hover:bg-[#E6FAF7] rounded-lg transition-colors">
                     <img src="images/logo.png" alt="HydroXeg Logo" class="w-10 h-10 object-contain">
                     <span class="text-xl font-bold text-[#00856A]">HydroXeg</span>
                 </a>
@@ -67,26 +70,33 @@
                 <!-- Navigation -->
                 <nav class="flex-1 p-4 space-y-2">
                     <div class="flex flex-col space-y-2">
-                        <a href="#" class="nav-btn active" data-tab="home">
-                            <i data-lucide="home" class="w-5 h-5"></i>
+                        <a href="#" class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-[#E6FAF7] text-gray-600 hover:text-[#00856A]" data-tab="home">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
                             <span>Home</span>
                         </a>
-                        <a href="#" class="nav-btn" data-tab="bins">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        <a href="#" class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-[#E6FAF7] text-gray-600 hover:text-[#00856A]" data-tab="bins">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
                             <span>Bins</span>
                         </a>
-                        <a href="#" class="nav-btn" data-tab="maintenance">
-                            <i data-lucide="settings" class="w-5 h-5"></i>
+                        <a href="#" class="nav-btn flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-[#E6FAF7] text-gray-600 hover:text-[#00856A]" data-tab="maintenance">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
                             <span>Maintenance</span>
                         </a>
                     </div>
                 </nav>
 
                 <!-- User Info -->
-                <div class="p-4 border-t">
+                <div class="p-4 border-t border-gray-100">
                     <div class="flex items-center justify-between">
                         <span id="user-email" class="text-sm font-medium text-gray-600"></span>
-                        <button id="logout-btn" class="text-red-500 hover:text-red-600">
+                        <button id="logout-btn" class="text-red-500 hover:text-red-600 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                             </svg>
@@ -97,16 +107,16 @@
         </aside>
 
         <!-- Mobile Header -->
-        <div class="lg:hidden fixed top-0 left-0 right-0 bg-white z-40 shadow-md">
+        <div class="lg:hidden fixed top-0 left-0 right-0 bg-[#00856A] z-40 shadow-md">
             <div class="flex items-center justify-between p-4">
-                <button id="mobile-menu-btn" class="p-2 hover:bg-gray-100 rounded-lg">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="mobile-menu-btn" class="p-2 hover:bg-[#007559] rounded-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-16 6h16"/>
                     </svg>
                 </button>
                 <a href="index.html" class="flex items-center space-x-3 hover:opacity-90 transition-opacity">
                     <img src="images/logo.png" alt="HydroXeg Logo" class="w-8 h-8 object-contain">
-                    <span class="text-lg font-bold text-[#00856A]">HydroXeg</span>
+                    <span class="text-lg font-bold text-white">HydroXeg</span>
                 </a>
                 <div class="w-8"></div>
             </div>
@@ -241,33 +251,33 @@
 
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="lg:hidden fixed inset-0 z-50 bg-black bg-opacity-50 hidden">
-            <div class="w-64 h-full bg-white transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar">
+            <div class="w-64 h-full transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar">
                 <div class="h-full flex flex-col">
-                    <div class="p-4 flex items-center justify-between border-b">
+                    <div class="p-4 flex items-center justify-between border-b border-[#007559] bg-[#00856A]">
                         <a href="index.html" class="flex items-center space-x-3 hover:opacity-90 transition-opacity">
                             <img src="images/logo.png" alt="HydroXeg Logo" class="w-8 h-8 object-contain">
-                            <span class="text-lg font-bold text-[#00856A]">HydroXeg</span>
+                            <span class="text-lg font-bold text-white">HydroXeg</span>
                         </a>
-                        <button class="mobile-menu-close p-2 hover:bg-gray-100 rounded-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button class="mobile-menu-close p-2 hover:bg-[#007559] rounded-lg transition-colors">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
-                    <nav class="flex-1 p-4 space-y-2">
-                        <button class="nav-btn active w-full" data-tab="home">
+                    <nav class="flex-1 p-4 space-y-2 bg-white">
+                        <button class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-[#E6FAF7] hover:text-[#00856A] text-gray-600" data-tab="home">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                             </svg>
                             <span>Home</span>
                         </button>
-                        <button class="nav-btn w-full" data-tab="bins">
+                        <button class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-[#E6FAF7] hover:text-[#00856A] text-gray-600" data-tab="bins">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
                             <span>Bins</span>
                         </button>
-                        <button class="nav-btn w-full" data-tab="maintenance">
+                        <button class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-[#E6FAF7] hover:text-[#00856A] text-gray-600" data-tab="maintenance">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -275,10 +285,10 @@
                             <span>Maintenance</span>
                         </button>
                     </nav>
-                    <div class="p-4 border-t">
+                    <div class="p-4 border-t border-gray-100 bg-white">
                         <div class="flex items-center justify-between">
                             <span id="mobile-user-email" class="text-sm font-medium text-gray-600"></span>
-                            <button id="mobile-logout-btn" class="text-red-500 hover:text-red-600">
+                            <button id="mobile-logout-btn" class="text-red-500 hover:text-red-600 transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                 </svg>
@@ -300,9 +310,61 @@
                 </div>
             </div>
         </div>
+
+        <!-- Logout Confirmation Modal -->
+        <div id="logout-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full text-center relative animate-fade-in">
+                <h3 class="text-xl font-bold mb-4 text-[#00856A]">Confirm Logout</h3>
+                <p class="mb-6 text-gray-700">Are you sure you want to logout?</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="cancel-logout-btn" class="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">Cancel</button>
+                    <button id="confirm-logout-btn" class="px-6 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition">Logout</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="dashboard.js"></script>
+    <script>
+        // Add event listener for clicking outside mobile menu
+        document.getElementById('mobile-menu').addEventListener('click', function(event) {
+            if (event.target === this) {
+                this.classList.add('hidden');
+                document.getElementById('mobile-sidebar').classList.add('-translate-x-full');
+            }
+        });
+
+        // Add active state styling for navigation buttons
+        document.querySelectorAll('.nav-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active state from all buttons
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('bg-[#00856A]', 'text-white');
+                    btn.classList.add('text-gray-600');
+                });
+                // Add active state to clicked button
+                this.classList.remove('text-gray-600');
+                this.classList.add('bg-[#00856A]', 'text-white');
+            });
+        });
+
+        // Set initial active state for Home
+        document.querySelector('.nav-btn[data-tab="home"]').classList.add('bg-[#00856A]', 'text-white');
+    </script>
+    <style>
+        /* Ensure logout modal overlay only darkens the dashboard */
+        #logout-modal {
+            background: rgba(0,0,0,0.5) !important;
+        }
+        #logout-modal > div {
+            background: #fff;
+        }
+        /* Mobile nav button tap feedback */
+        .nav-btn:active {
+            background: #E6FAF7 !important;
+            color: #00856A !important;
+        }
+    </style>
 </body>
 </html> 

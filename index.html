@@ -94,22 +94,89 @@
         }
     </style>
     <script>
-        function toggleDropdown() {
-            document.getElementById("mobileDropdown").classList.toggle("show");
-        }
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropbtn = document.querySelector('.dropbtn');
+            const mobileDropdown = document.getElementById('mobileDropdown');
+            let isDropdownOpen = false;
 
-        // Close the dropdown if the user clicks outside of it
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
+            function toggleDropdown(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                 }
+                
+                isDropdownOpen = !isDropdownOpen;
+                mobileDropdown.classList.toggle('show');
             }
-        }
+
+            function closeDropdown() {
+                isDropdownOpen = false;
+                mobileDropdown.classList.remove('show');
+            }
+
+            // Toggle dropdown on button click
+            if (dropbtn) {
+                dropbtn.addEventListener('click', toggleDropdown);
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (isDropdownOpen && !mobileDropdown.contains(e.target) && !dropbtn.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+
+            // Close dropdown when pressing escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && isDropdownOpen) {
+                    closeDropdown();
+                }
+            });
+
+            // Close dropdown when clicking a link
+            const dropdownLinks = mobileDropdown.querySelectorAll('a');
+            dropdownLinks.forEach(link => {
+                link.addEventListener('click', closeDropdown);
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768 && isDropdownOpen) {
+                    closeDropdown();
+                }
+            });
+
+            // Check authentication state
+            firebase.auth().onAuthStateChanged((user) => {
+                const loginButtons = document.querySelectorAll('.login-button');
+                loginButtons.forEach(button => {
+                    if (user) {
+                        button.textContent = 'Maintenance';
+                        button.href = 'dashboard.html';
+                    } else {
+                        button.textContent = 'Login';
+                        button.href = 'dashboard.html';
+                    }
+                });
+            });
+
+            // Only add event listener if the element exists
+            const authModal = document.getElementById('auth-modal');
+            if (authModal) {
+                authModal.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        hideAuthModal();
+                    }
+                });
+            }
+
+            // Only add event listener if the element exists
+            const adminForm = document.getElementById('admin-form');
+            if (adminForm) {
+                adminForm.addEventListener('submit', handleAdminLogin);
+            }
+        });
     </script>
     
 </head>
@@ -122,7 +189,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center space-x-2">
+                    <a href="index.html" class="flex items-center space-x-2">
                         <img src="images/logo.png" alt="HydroXeg Logo" class="w-12 h-12 object-contain">
                         <span class="text-2xl font-bold text-[#00856A]">HydroXeg</span>
                     </a>
