@@ -471,12 +471,17 @@ function updateBinMaterialsFromFirebase() {
         
         // Only update last refilled time if water level is 100%
         if (waterLevel === 100) {
+            const now = new Date().getTime();
+            waterMaterial.lastCollectionTime = now;
             waterMaterial.lastCollection = 'Just now';
             // Update Firebase
             database.ref('LastRefill').set({
-                timestamp: new Date().getTime()
+                timestamp: now
             });
             addSystemLog('Water tank refilled to 100%', 'info');
+        } else if (waterMaterial.lastCollectionTime) {
+            // Update the relative time display
+            waterMaterial.lastCollection = getRelativeTime(waterMaterial.lastCollectionTime);
         }
         
         updateMaterialLevel('Water', waterLevel);
@@ -632,6 +637,13 @@ function updateMaintenanceUI({ bin, systemLogs }) {
 setInterval(() => {
     if (state.activeTab === 'maintenance') {
         fetchMaintenanceData().then(updateMaintenanceUI);
+    }
+}, 5000);
+
+// Add periodic update for home section
+setInterval(() => {
+    if (state.activeTab === 'home') {
+        renderHome();
     }
 }, 5000);
 
@@ -871,15 +883,15 @@ function renderMaintenance() {
     if (!bin) return;
 
     mainContent.innerHTML = `
-        <div class="dashboard-card p-6 mb-8">
+        <div class="dashboard-card p-4 sm:p-6 mb-4 sm:mb-8">
             <h2 class="text-xl font-bold text-[#00856A] mb-2">Maintenance</h2>
             <p class="text-gray-600">Manage maintenance tasks for ${bin.name}</p>
         </div>
 
         <!-- Quick Actions Section -->
-        <div class="dashboard-card p-6 mb-8">
+        <div class="dashboard-card p-4 sm:p-6 mb-4 sm:mb-8">
             <h3 class="text-lg font-semibold text-[#1E293B] mb-4">Quick Actions</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 <button id="empty-bin-btn" 
                     class="w-full py-3 bg-[#22C55E] hover:bg-[#16A34A] text-white rounded-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center">
                     <i data-lucide="trash-2" class="w-5 h-5 mr-2"></i>
@@ -899,10 +911,10 @@ function renderMaintenance() {
         </div>
 
         <!-- System Logs Section -->
-        <div class="dashboard-card p-6">
-            <div class="flex justify-between items-center mb-4">
+        <div class="dashboard-card p-4 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
                 <h3 class="text-lg font-semibold text-[#1E293B]">System Logs</h3>
-                <div class="flex space-x-2">
+                <div class="flex flex-wrap gap-2">
                     <button onclick="filterLogs('all')" class="px-3 py-1 rounded-lg bg-[#00856A] text-white text-sm">All</button>
                     <button onclick="filterLogs('calibration')" class="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-sm">Calibration</button>
                     <button onclick="filterLogs('detection')" class="px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-sm">Detection</button>
@@ -911,8 +923,8 @@ function renderMaintenance() {
             </div>
             <div class="space-y-2" id="system-logs">
                 ${systemLogs.map(log => `
-                    <div class="flex items-start p-3 bg-white rounded-lg border border-gray-100">
-                        <div class="flex-1">
+                    <div class="flex flex-col sm:flex-row sm:items-start p-3 bg-white rounded-lg border border-gray-100">
+                        <div class="flex-1 mb-2 sm:mb-0">
                             <p class="text-sm text-gray-700">${log.action}</p>
                             <p class="text-xs text-gray-500">${new Date(log.timestamp).toLocaleString()}</p>
                         </div>
@@ -1143,8 +1155,8 @@ function filterLogs(type) {
     const filteredLogs = type === 'all' ? systemLogs : systemLogs.filter(log => log.type === type);
     
     logsContainer.innerHTML = filteredLogs.map(log => `
-        <div class="flex items-start p-3 bg-white rounded-lg border border-gray-100">
-            <div class="flex-1">
+        <div class="flex flex-col sm:flex-row sm:items-start p-3 bg-white rounded-lg border border-gray-100">
+            <div class="flex-1 mb-2 sm:mb-0">
                 <p class="text-sm text-gray-700">${log.action}</p>
                 <p class="text-xs text-gray-500">${new Date(log.timestamp).toLocaleString()}</p>
             </div>
